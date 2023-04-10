@@ -1,3 +1,5 @@
+"""Tetris pygame"""
+
 import pygame
 from copy import deepcopy
 from random import choice, randrange
@@ -5,6 +7,7 @@ from const import *
 
 
 def check_borders():
+    """Функція, яка відстежує вихід за межі поля"""
     if not 0 <= figure[i].x < WIDTH:
         return False
     elif figure[i].y > HEIGHT - 1 or field[figure[i].y][figure[i].x]:
@@ -13,18 +16,20 @@ def check_borders():
 
 
 def get_record():
+    """Функція, яка відкриває файл для читання найкращого результату"""
     try:
-        with open('record.txt') as f:
-            return f.readline()
+        with open('record.txt') as file:
+            return file.readline()
     except FileNotFoundError:
-        with open('record.txt', 'w') as f:
-            f.write('0')
+        with open('record.txt', 'w', encoding='UTF-8') as file:
+            file.write('0')
 
 
 def set_record(record, score):
+    """Функція, яка записує новий рекорд до файлу"""
     rec = max(int(record), score)
-    with open('record.txt', 'w') as f:
-        f.write(str(rec))
+    with open('record.txt', 'w', encoding='UTF-8') as file:
+        file.write(str(rec))
 
 # ініціалізація бібліотеки
 pygame.init()
@@ -54,7 +59,7 @@ figures = [[pygame.Rect(x + WIDTH // 2, y + 1, 1, 1) for x, y in fig_pos] for fi
 figure_rect = pygame.Rect(0, 0, TILE - 2, TILE - 2)
 field = [[0 for i in range(WIDTH)] for j in range(HEIGHT)]
 
-anim_count, anim_speed, anim_limit = 0, 60, 2000
+ANIM_COUNT, ANIM_SPEED, ANIM_LIMIT = 0, 60, 2000
 
 
 bg = pygame.image.load('img/bg1.jpg').convert()
@@ -72,7 +77,7 @@ get_color = lambda: (randrange(50, 256), randrange(50, 256), randrange(50, 256))
 figure, next_figure = deepcopy(choice(figures)), deepcopy(choice(figures))
 color, next_color = get_color(), get_color()
 
-score, lines = 0, 0
+SCORE, lines = 0, 0
 
 while True:
     record = get_record()
@@ -93,7 +98,7 @@ while True:
             elif event.key == pygame.K_RIGHT:
                 dx = 1
             elif event.key == pygame.K_DOWN:
-                anim_limit = 100
+                ANIM_LIMIT = 100
             elif event.key == pygame.K_UP:
                 rotate = True
     # move x
@@ -104,9 +109,9 @@ while True:
             figure = deepcopy(figure_old)
             break
     # move y
-    anim_count += anim_speed
-    if anim_count > anim_limit:
-        anim_count = 0
+    ANIM_COUNT += ANIM_SPEED
+    if ANIM_COUNT > ANIM_LIMIT:
+        ANIM_COUNT = 0
         figure_old = deepcopy(figure)
         for i in range(4):
             figure[i].y += 1
@@ -115,7 +120,7 @@ while True:
                     field[figure_old[i].y][figure_old[i].x] = color
                 figure, color = next_figure, next_color
                 next_figure, next_color = deepcopy(choice(figures)), get_color()
-                anim_limit = 2000
+                ANIM_LIMIT = 2000
                 break
     # rotate
     center = figure[0]
@@ -140,10 +145,10 @@ while True:
         if count < WIDTH:
             line -= 1
         else:
-            anim_speed += 3
+            ANIM_SPEED += 3
             lines += 1
     # compute score
-    score += SCORES[lines]
+    SCORE += SCORES[lines]
     # draw grid
     [pygame.draw.rect(game_sc, (40, 40, 40), i_rect, 1) for i_rect in grid]
     # draw figure
@@ -165,16 +170,16 @@ while True:
     # draw titles
     sc.blit(title_tetris, (450, 10))
     sc.blit(title_score, (450, 580))
-    sc.blit(font.render(str(score), True, pygame.Color('white')), (450, 640))
+    sc.blit(font.render(str(SCORE), True, pygame.Color('white')), (450, 640))
     sc.blit(title_record, (450, 450))
     sc.blit(font.render(record, True, pygame.Color('gold')), (450, 510))
     # game over
     for i in range(WIDTH):
         if field[0][i]:
-            set_record(record, score)
+            set_record(record, SCORE)
             field = [[0 for i in range(WIDTH)] for i in range(HEIGHT)]
-            anim_count, anim_speed, anim_limit = 0, 60, 2000
-            score = 0
+            ANIM_COUNT, ANIM_SPEED, ANIM_LIMIT = 0, 60, 2000
+            SCORE = 0
             for i_rect in grid:
                 pygame.draw.rect(game_sc, get_color(), i_rect)
                 sc.blit(game_sc, (20, 20))
