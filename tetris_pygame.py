@@ -4,9 +4,10 @@ import pygame
 from copy import deepcopy
 from random import choice, randrange
 from const import *
+from typing import List, Tuple
 
 
-def check_borders():
+def check_borders() -> bool:
     """Функція, яка відстежує вихід за межі поля"""
     if not 0 <= figure[i].x < WIDTH:
         return False
@@ -25,7 +26,7 @@ def get_record():
             file.write('0')
 
 
-def set_record(record, score):
+def set_record(record, score: int):
     """Функція, яка записує новий рекорд до файлу"""
     rec = max(int(record), score)
     with open('record.txt', 'w', encoding='UTF-8') as file:
@@ -43,9 +44,9 @@ pygame.mixer.music.load(MAIN_MUSIC_PATH)
 pygame.mixer.music.set_volume(0.1)
 pygame.mixer.music.play(-1)
 
-grid = [pygame.Rect(x * TILE, y * TILE, TILE, TILE) for x in range(WIDTH) for y in range(HEIGHT)]
+grid: List[pygame.Rect] = [pygame.Rect(x * TILE, y * TILE, TILE, TILE) for x in range(WIDTH) for y in range(HEIGHT)]
 
-figures_pos = [
+figures_pos: List[List[Tuple[int, int]]] = [
     [(-2, -1), (-1, -1), (0, -1), (1, -1)],
     [(0, -1), (-1, -1), (-1, 0), (0, 0)],
     [(-1, -1), (0, 0), (-1, 0), (0, 1)],
@@ -55,11 +56,11 @@ figures_pos = [
     [(0, 0), (0, -1), (0, 1), (-1, 0)],
 ]
 
-figures = [[pygame.Rect(x + WIDTH // 2, y + 1, 1, 1) for x, y in fig_pos] for fig_pos in figures_pos]
+figures: List[List[pygame.Rect]] = [[pygame.Rect(x + WIDTH // 2, y + 1, 1, 1) for x, y in fig_pos] for fig_pos in figures_pos]
 figure_rect = pygame.Rect(0, 0, TILE - 2, TILE - 2)
-field = [[0 for i in range(WIDTH)] for j in range(HEIGHT)]
+field: List[List[int]] = [[0 for i in range(WIDTH)] for j in range(HEIGHT)]
 
-ANIM_COUNT, ANIM_SPEED, ANIM_LIMIT = 0, 60, 2000
+ANIM_COUNT: int, ANIM_SPEED: int, ANIM_LIMIT: int = 0, 60, 2000
 
 
 bg = pygame.image.load('img/bg1.jpg').convert()
@@ -77,11 +78,11 @@ get_color = lambda: (randrange(50, 256), randrange(50, 256), randrange(50, 256))
 figure, next_figure = deepcopy(choice(figures)), deepcopy(choice(figures))
 color, next_color = get_color(), get_color()
 
-SCORE, lines = 0, 0
+SCORE: int, lines: int = 0, 0
 
 while True:
     record = get_record()
-    dx, rotate = 0, False
+    dx: int, rotate: bool = 0, False
     sc.blit(bg, (0, 0))
     sc.blit(game_sc, (20, 20))
     game_sc.blit(game_bg, (0, 0))
